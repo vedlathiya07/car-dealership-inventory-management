@@ -7,6 +7,7 @@ import { Vehicle } from '../models/Vehicle.js';
 
 let mongoServer;
 let userToken;
+let adminToken; // 1. Declare adminToken
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 
@@ -16,6 +17,7 @@ beforeAll(async () => {
     await mongoose.connect(uri);
 
     userToken = jwt.sign({ userId: 'user123', role: 'USER' }, JWT_SECRET);
+    adminToken = jwt.sign({ userId: 'admin123', role: 'ADMIN' }, JWT_SECRET); // 2. Initialize adminToken
 });
 
 afterAll(async () => {
@@ -145,5 +147,82 @@ describe('GET /api/vehicles/search', () => {
         expect(res.statusCode).toBe(200);
         expect(res.body.length).toBe(1);
         expect(res.body[0].model).toBe('RAV4');
+    });
+});
+
+describe('PUT /api/vehicles/:id', () => {
+    it('should return 401 if unauthenticated', async () => {
+        const vehicle = await Vehicle.create({
+            make: 'Toyota', model: 'Corolla', category: 'Sedan', price: 18000, quantity: 2
+        });
+
+        const res = await request(app)
+            .put(`/api/vehicles/${vehicle._id}`)
+            .send({ price: 19000 });
+
+        expect(res.statusCode).toBe(401);
+    });
+
+    it('should update a vehicle and return 200 when authenticated', async () => {
+        const vehicle = await Vehicle.create({
+            make: 'Toyota', model: 'Corolla', category: 'Sedan', price: 18000, quantity: 2
+        });
+
+        const res = await request(app)
+            .put(`/api/vehicles/${vehicle._id}`)
+            .set('Authorization', `Bearer ${userToken}`)
+            .send({ price: 19000, quantity: 4 });
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body.price).toBe(19000);
+        expect(res.body.quantity).toBe(4);
+    });
+
+    it('should return 404 for unknown vehicle ID', async () => {
+        const fakeId = new mongoose.Types.ObjectId();
+        const res = await request(app)
+            .put(`/api/vehicles/${fakeId}`)
+            .set('Authorization', `Bearer ${userToken}`)
+            .send({ price: 19000 });
+
+        expect(res.statusCode).toBe(404);
+        expect(res.body).toHaveProperty('error');
+    });
+});
+
+describe('DELETE /api/vehicles/:id', () => {
+    it('should return 403 for non-admin user', async () => {
+        const vehicle = await Vehicle.create({
+            make: 'Nissan', model: 'Altima', category: 'Sedan', price: 21000, quantity: 1
+        });
+
+        const res = await request(app)
+            .delete(`/api/vehicles/${vehicle._id}`)
+            .set('Authorization', `Bearer ${userToken}`);
+
+        expect(res.statusCode).toBe(403);
+    });
+
+    it('should delete vehicle and return 200 for ADMIN user', async () => {
+        const vehicle = await Vehicle.create({
+            make: 'Nissan', model: 'Altima', category: 'Sedan', price: 21000, quantity: 1
+        });
+
+        const res = await request(app)
+            .delete(`/api/vehicles/${vehicle._id}`)
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toHaveProperty('message');
+    });
+
+    it('should return 404 for unknown vehicle ID on delete', async () => {
+        const fakeId = new mongoose.Types.ObjectId();
+        const res = await request(app)
+            .delete(`/api/vehicles/${fakeId}`)
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        expect(res.statusCode).toBe(404);
+        expect(res.body).toHaveProperty('error');
     });
 });

@@ -58,3 +58,43 @@ export const searchVehicles = async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 };
+
+export const updateVehicle = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const vehicle = await Vehicle.findByIdAndUpdate(
+            id,
+            req.body,
+            { new: true, runValidators: true }
+        );
+
+        if (!vehicle) {
+            return res.status(404).json({ error: 'Vehicle not found' });
+        }
+
+        return res.status(200).json(vehicle);
+    } catch (error) {
+        if (error.kind === 'ObjectId') {
+            return res.status(404).json({ error: 'Vehicle not found' });
+        }
+        return res.status(400).json({ error: error.message });
+    }
+};
+
+export const deleteVehicle = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const vehicle = await Vehicle.findByIdAndDelete(id);
+
+        if (!vehicle) {
+            return res.status(404).json({ error: 'Vehicle not found' });
+        }
+
+        return res.status(200).json({ message: 'Vehicle deleted successfully' });
+    } catch (error) {
+        if (error.kind === 'ObjectId') {
+            return res.status(404).json({ error: 'Vehicle not found' });
+        }
+        return res.status(500).json({ error: error.message });
+    }
+};
