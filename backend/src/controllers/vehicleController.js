@@ -98,3 +98,53 @@ export const deleteVehicle = async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 };
+
+export const purchaseVehicle = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const vehicle = await Vehicle.findById(id);
+
+        if (!vehicle) {
+            return res.status(404).json({ error: 'Vehicle not found' });
+        }
+
+        if (vehicle.quantity <= 0) {
+            return res.status(400).json({ error: 'Vehicle is out of stock' });
+        }
+
+        vehicle.quantity -= 1;
+        await vehicle.save();
+
+        return res.status(200).json(vehicle);
+    } catch (error) {
+        if (error.kind === 'ObjectId') {
+            return res.status(404).json({ error: 'Vehicle not found' });
+        }
+        return res.status(500).json({ error: error.message });
+    }
+};
+
+export const restockVehicle = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { quantity } = req.body;
+
+        const amountToAdd = Number(quantity) > 0 ? Number(quantity) : 1;
+
+        const vehicle = await Vehicle.findById(id);
+
+        if (!vehicle) {
+            return res.status(404).json({ error: 'Vehicle not found' });
+        }
+
+        vehicle.quantity += amountToAdd;
+        await vehicle.save();
+
+        return res.status(200).json(vehicle);
+    } catch (error) {
+        if (error.kind === 'ObjectId') {
+            return res.status(404).json({ error: 'Vehicle not found' });
+        }
+        return res.status(500).json({ error: error.message });
+    }
+};

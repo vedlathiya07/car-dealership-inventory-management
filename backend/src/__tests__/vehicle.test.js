@@ -7,7 +7,7 @@ import { Vehicle } from '../models/Vehicle.js';
 
 let mongoServer;
 let userToken;
-let adminToken; // 1. Declare adminToken
+let adminToken;
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 
@@ -17,7 +17,7 @@ beforeAll(async () => {
     await mongoose.connect(uri);
 
     userToken = jwt.sign({ userId: 'user123', role: 'USER' }, JWT_SECRET);
-    adminToken = jwt.sign({ userId: 'admin123', role: 'ADMIN' }, JWT_SECRET); // 2. Initialize adminToken
+    adminToken = jwt.sign({ userId: 'admin123', role: 'ADMIN' }, JWT_SECRET);
 });
 
 afterAll(async () => {
@@ -224,5 +224,72 @@ describe('DELETE /api/vehicles/:id', () => {
 
         expect(res.statusCode).toBe(404);
         expect(res.body).toHaveProperty('error');
+    });
+});
+
+describe('POST /api/vehicles/:id/purchase', () => {
+    it('should decrement vehicle quantity by 1 and return 200', async () => {
+        const vehicle = await Vehicle.create({
+            make: 'Mazda', model: 'CX-5', category: 'SUV', price: 28000, quantity: 3
+        });
+
+        const res = await request(app)
+            .post(`/api/vehicles/${vehicle._id}/purchase`)
+            .set('Authorization', `Bearer ${userToken}`);
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body.quantity).toBe(2);
+    });
+
+    it('should return 400 if vehicle quantity is already 0', async () => {
+        const vehicle = await Vehicle.create({
+            make: 'Mazda', model: 'CX-5', category: 'SUV', price: 28000, quantity: 0
+        });
+
+        const res = await request(app)
+            .post(`/api/vehicles/${vehicle._id}/purchase`)
+            .set('Authorization', `Bearer ${userToken}`);
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body).toHaveProperty('error');
+    });
+
+    it('should return 404 for unknown vehicle ID on purchase', async () => {
+        const fakeId = new mongoose.Types.ObjectId();
+        const res = await request(app)
+            .post(`/api/vehicles/${fakeId}/purchase`)
+            .set('Authorization', `Bearer ${userToken}`);
+
+        expect(res.statusCode).toBe(404);
+        expect(res.body).toHaveProperty('error');
+    });
+});
+
+describe('POST /api/vehicles/:id/restock', () => {
+    it('should return 403 for non-admin user on restock', async () => {
+        const vehicle = await Vehicle.create({
+            make: 'Tesla', model: 'Model 3', category: 'Sedan', price: 35000, quantity: 1
+        });
+
+        const res = await request(app)
+            .post(`/api/vehicles/${vehicle._id}/restock`)
+            .set('Authorization', `Bearer ${userToken}`)
+            .send({ quantity: 5 });
+
+        expect(res.statusCode).toBe(403);
+    });
+
+    it('should increment vehicle quantity and return 200 for ADMIN user', async () => {
+        const vehicle = await Vehicle.create({
+            make: 'Tesla', model: 'Model 3', category: 'Sedan', price: 35000, quantity: 1
+        });
+
+        const res = await request(app)
+            .post(`/api/vehicles/${vehicle._id}/restock`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ quantity: 5 });
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body.quantity).toBe(6);
     });
 });

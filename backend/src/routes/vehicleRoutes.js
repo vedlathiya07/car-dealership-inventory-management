@@ -4,7 +4,9 @@ import {
     getVehicles,
     searchVehicles,
     updateVehicle,
-    deleteVehicle
+    deleteVehicle,
+    purchaseVehicle,
+    restockVehicle
 } from '../controllers/vehicleController.js';
 import { requireAuth, requireAdmin } from '../middleware/authMiddleware.js';
 
@@ -15,6 +17,9 @@ router.use(requireAuth);
 router.get('/search', searchVehicles);
 router.post('/', createVehicle);
 router.get('/', getVehicles);
+
+router.post('/:id/purchase', purchaseVehicle);
+router.post('/:id/restock', requireAdmin, restockVehicle);
 
 router.put('/:id', updateVehicle);
 router.delete('/:id', requireAdmin, deleteVehicle);
