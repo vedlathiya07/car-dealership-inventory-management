@@ -14,7 +14,7 @@ const userSchema = new Schema({
         type: String,
         enum: ['USER', 'ADMIN'],
         default: 'USER'
-    },
+    }
 });
 
 export const User = model('User', userSchema);

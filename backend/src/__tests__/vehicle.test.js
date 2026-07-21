@@ -88,3 +88,62 @@ describe('Vehicle Endpoints - Create & List', () => {
         });
     });
 });
+
+describe('GET /api/vehicles/search', () => {
+    beforeEach(async () => {
+        await Vehicle.insertMany([
+            { make: 'Toyota', model: 'Camry', category: 'Sedan', price: 25000, quantity: 5 },
+            { make: 'Toyota', model: 'RAV4', category: 'SUV', price: 30000, quantity: 2 },
+            { make: 'Honda', model: 'Civic', category: 'Sedan', price: 20000, quantity: 4 },
+            { make: 'Ford', model: 'Mustang', category: 'Coupe', price: 40000, quantity: 1 }
+        ]);
+    });
+
+    it('should filter vehicles by make alone', async () => {
+        const res = await request(app)
+            .get('/api/vehicles/search?make=Toyota')
+            .set('Authorization', `Bearer ${userToken}`);
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body.length).toBe(2);
+        expect(res.body.every(v => v.make === 'Toyota')).toBe(true);
+    });
+
+    it('should filter vehicles by model alone', async () => {
+        const res = await request(app)
+            .get('/api/vehicles/search?model=Civic')
+            .set('Authorization', `Bearer ${userToken}`);
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body.length).toBe(1);
+        expect(res.body[0].model).toBe('Civic');
+    });
+
+    it('should filter vehicles by category alone', async () => {
+        const res = await request(app)
+            .get('/api/vehicles/search?category=Sedan')
+            .set('Authorization', `Bearer ${userToken}`);
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body.length).toBe(2);
+    });
+
+    it('should filter vehicles by price range (minPrice and maxPrice)', async () => {
+        const res = await request(app)
+            .get('/api/vehicles/search?minPrice=22000&maxPrice=32000')
+            .set('Authorization', `Bearer ${userToken}`);
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body.length).toBe(2);
+    });
+
+    it('should combine multiple filters', async () => {
+        const res = await request(app)
+            .get('/api/vehicles/search?make=Toyota&category=SUV')
+            .set('Authorization', `Bearer ${userToken}`);
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body.length).toBe(1);
+        expect(res.body[0].model).toBe('RAV4');
+    });
+});

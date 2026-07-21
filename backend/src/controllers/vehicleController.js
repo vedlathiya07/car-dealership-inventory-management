@@ -30,3 +30,31 @@ export const getVehicles = async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 };
+
+export const searchVehicles = async (req, res) => {
+    try {
+        const { make, model, category, minPrice, maxPrice } = req.query;
+
+        const filter = {};
+
+        if (make) {
+            filter.make = { $regex: make, $options: 'i' };
+        }
+        if (model) {
+            filter.model = { $regex: model, $options: 'i' };
+        }
+        if (category) {
+            filter.category = { $regex: category, $options: 'i' };
+        }
+        if (minPrice || maxPrice) {
+            filter.price = {};
+            if (minPrice) filter.price.$gte = Number(minPrice);
+            if (maxPrice) filter.price.$lte = Number(maxPrice);
+        }
+
+        const vehicles = await Vehicle.find(filter);
+        return res.status(200).json(vehicles);
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+};
