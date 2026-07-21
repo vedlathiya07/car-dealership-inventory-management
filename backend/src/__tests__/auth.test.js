@@ -61,3 +61,29 @@ it('should return 400 if password is missing or weak (less than 6 characters)', 
     expect(res.statusCode).toBe(400);
     expect(res.body).toHaveProperty('error');
 });
+
+describe('POST /api/auth/login', () => {
+    it('should return 200 and JWT token on correct credentials', async () => {
+        // Register user first
+        await request(app)
+            .post('/api/auth/register')
+            .send({ email: 'loginuser@example.com', password: 'password123' });
+
+        // Attempt login
+        const res = await request(app)
+            .post('/api/auth/login')
+            .send({ email: 'loginuser@example.com', password: 'password123' });
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toHaveProperty('token');
+    });
+
+    it('should return 401 on wrong password or unknown user', async () => {
+        const res = await request(app)
+            .post('/api/auth/login')
+            .send({ email: 'nonexistent@example.com', password: 'password123' });
+
+        expect(res.statusCode).toBe(401);
+        expect(res.body).toHaveProperty('error');
+    });
+});
