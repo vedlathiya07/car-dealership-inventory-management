@@ -26,7 +26,7 @@ export default function SearchBar({ onSearch }) {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="bg-gray-50 border rounded-lg p-5 mb-6 shadow-sm">
+        <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-xl p-6 mb-8 shadow-sm">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
                 <div>
                     <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Make</label>
@@ -35,7 +35,7 @@ export default function SearchBar({ onSearch }) {
                         placeholder="Make"
                         value={make}
                         onChange={(e) => setMake(e.target.value)}
-                        className="w-full px-3 py-1.5 border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-slate-250 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white transition"
                     />
                 </div>
                 <div>
@@ -45,7 +45,7 @@ export default function SearchBar({ onSearch }) {
                         placeholder="Model"
                         value={model}
                         onChange={(e) => setModel(e.target.value)}
-                        className="w-full px-3 py-1.5 border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-slate-250 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white transition"
                     />
                 </div>
                 <div>
@@ -54,7 +54,7 @@ export default function SearchBar({ onSearch }) {
                         aria-label="Category"
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
-                        className="w-full px-3 py-1.5 border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                        className="w-full px-3 py-2 border border-slate-250 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white transition"
                     >
                         <option value="">All Categories</option>
                         <option value="Sedan">Sedan</option>
@@ -72,7 +72,7 @@ export default function SearchBar({ onSearch }) {
                         placeholder="Min Price"
                         value={minPrice}
                         onChange={(e) => setMinPrice(e.target.value)}
-                        className="w-full px-3 py-1.5 border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-slate-250 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white transition"
                     />
                 </div>
                 <div>
@@ -82,22 +82,25 @@ export default function SearchBar({ onSearch }) {
                         placeholder="Max Price"
                         value={maxPrice}
                         onChange={(e) => setMaxPrice(e.target.value)}
-                        className="w-full px-3 py-1.5 border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-slate-250 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white transition"
                     />
                 </div>
             </div>
-            <div className="flex justify-end gap-3 mt-4">
+            <div className="flex justify-end gap-3 mt-4 border-t pt-4 border-slate-100">
                 <button
                     type="button"
                     onClick={handleReset}
-                    className="px-4 py-1.5 border text-gray-600 rounded-md text-sm hover:bg-gray-100 transition"
+                    className="px-4 py-1.5 border border-slate-350 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-50 active:bg-gray-100 transition shadow-sm cursor-pointer"
                 >
                     Reset
                 </button>
                 <button
                     type="submit"
-                    className="px-4 py-1.5 bg-blue-600 text-white rounded-md text-sm font-semibold hover:bg-blue-700 transition"
+                    className="px-5 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg text-sm font-semibold shadow-sm hover:shadow transition duration-150 flex items-center gap-1.5 cursor-pointer"
                 >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
                     Search
                 </button>
             </div>
