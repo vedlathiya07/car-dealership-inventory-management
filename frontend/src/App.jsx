@@ -105,6 +105,7 @@ function MainDashboard({ activeTab, setActiveTab }) {
   const [editCategory, setEditCategory] = useState('');
   const [editPrice, setEditPrice] = useState('');
   const [editQuantity, setEditQuantity] = useState('');
+  const [editImageFile, setEditImageFile] = useState(null);
 
   // Restock state
   const [restockAmounts, setRestockAmounts] = useState({});
@@ -212,28 +213,33 @@ function MainDashboard({ activeTab, setActiveTab }) {
     setEditCategory(vehicle.category);
     setEditPrice(vehicle.price);
     setEditQuantity(vehicle.quantity);
+    setEditImageFile(null);
   };
 
   const handleCancelEdit = () => {
     setEditingVehicleId(null);
+    setEditImageFile(null);
   };
 
   const handleSaveEdit = async (e, vehicleId) => {
     e.preventDefault();
     try {
+      const formData = new FormData();
+      formData.append('make', editMake);
+      formData.append('model', editModel);
+      formData.append('category', editCategory);
+      formData.append('price', Number(editPrice));
+      formData.append('quantity', Number(editQuantity));
+      if (editImageFile) {
+        formData.append('image', editImageFile);
+      }
+
       const res = await fetch(`${API_URL}/api/vehicles/${vehicleId}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          make: editMake,
-          model: editModel,
-          category: editCategory,
-          price: Number(editPrice),
-          quantity: Number(editQuantity)
-        })
+        body: formData
       });
 
       if (!res.ok) {
@@ -245,6 +251,7 @@ function MainDashboard({ activeTab, setActiveTab }) {
         prev.map((v) => (v._id === vehicleId ? updated : v))
       );
       setEditingVehicleId(null);
+      setEditImageFile(null);
     } catch (err) {
       alert(err.message);
     }
@@ -439,6 +446,15 @@ function MainDashboard({ activeTab, setActiveTab }) {
                             />
                           </div>
                         </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Update Image</label>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => setEditImageFile(e.target.files[0])}
+                            className="w-full px-3 py-1 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
+                          />
+                        </div>
                         <div className="flex gap-2 pt-2 border-t border-slate-100 mt-2">
                           <button
                             type="button"
@@ -460,82 +476,89 @@ function MainDashboard({ activeTab, setActiveTab }) {
                 }
 
                 return (
-                  <div key={vehicle._id} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md hover:-translate-y-1 transition duration-200 flex flex-col justify-between">
-                    <div>
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">{vehicle.category}</span>
-                          <h2 className="text-xl font-bold text-slate-800 leading-tight">
-                            {vehicle.make} {vehicle.model}
-                          </h2>
+                  <div key={vehicle._id} className="bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 transition duration-200 flex flex-col justify-between overflow-hidden">
+                    {vehicle.imageUrl && (
+                      <div className="w-full h-48 bg-slate-100 border-b border-slate-100 overflow-hidden relative">
+                        <img src={vehicle.imageUrl} alt={`${vehicle.make} ${vehicle.model}`} className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                    <div className="p-6 flex-1 flex flex-col justify-between">
+                      <div>
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">{vehicle.category}</span>
+                            <h2 className="text-xl font-bold text-slate-800 leading-tight">
+                              {vehicle.make} {vehicle.model}
+                            </h2>
+                          </div>
+                          <span className="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-100 uppercase tracking-wider">
+                            {vehicle.category}
+                          </span>
                         </div>
-                        <span className="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-100 uppercase tracking-wider">
-                          {vehicle.category}
-                        </span>
+                        <p className="text-2xl font-extrabold text-blue-600 mb-6">
+                          ${vehicle.price.toLocaleString()}
+                        </p>
                       </div>
-                      <p className="text-2xl font-extrabold text-blue-600 mb-6">
-                        ${vehicle.price.toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="border-t border-slate-100 pt-4 mt-auto">
-                      <div className="flex justify-between items-center text-sm mb-4">
-                        <span className="text-slate-400 font-medium">Availability</span>
-                        <span className={`font-bold flex items-center gap-1.5 ${vehicle.quantity > 0 ? 'text-emerald-600' : 'text-rose-500'}`}>
-                          <span className={`w-2 h-2 rounded-full ${vehicle.quantity > 0 ? 'bg-emerald-500' : 'bg-rose-500'}`}></span>
-                          {vehicle.quantity > 0 ? `${vehicle.quantity} In Stock` : 'Sold Out'}
-                        </span>
-                      </div>
-                      <button
-                        onClick={() => setPurchasingVehicle(vehicle)}
-                        disabled={vehicle.quantity <= 0}
-                        className={`w-full py-2.5 rounded-xl font-bold text-sm transition-all duration-150 cursor-pointer ${vehicle.quantity > 0
-                          ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow'
-                          : 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
-                          }`}
-                      >
-                        Purchase
-                      </button>
+                      <div className="border-t border-slate-100 pt-4 mt-auto">
+                        <div className="flex justify-between items-center text-sm mb-4">
+                          <span className="text-slate-400 font-medium">Availability</span>
+                          <span className={`font-bold flex items-center gap-1.5 ${vehicle.quantity > 0 ? 'text-emerald-600' : 'text-rose-500'}`}>
+                            <span className={`w-2 h-2 rounded-full ${vehicle.quantity > 0 ? 'bg-emerald-500' : 'bg-rose-500'}`}></span>
+                            {vehicle.quantity > 0 ? `${vehicle.quantity} In Stock` : 'Sold Out'}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => setPurchasingVehicle(vehicle)}
+                          disabled={vehicle.quantity <= 0}
+                          className={`w-full py-2.5 rounded-xl font-bold text-sm transition-all duration-150 cursor-pointer ${vehicle.quantity > 0
+                            ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow'
+                            : 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
+                            }`}
+                        >
+                          Purchase
+                        </button>
 
-                      {user?.role === 'ADMIN' && (
-                        <div className="mt-4 border-t border-slate-100 pt-4 space-y-3">
-                          <div className="flex gap-2 items-center">
-                            <input
-                              type="number"
-                              min="1"
-                              placeholder="Amt"
-                              value={restockAmounts[vehicle._id] || ''}
-                              onChange={(e) => setRestockAmounts({ ...restockAmounts, [vehicle._id]: e.target.value })}
-                              className="w-20 px-2.5 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-center"
-                            />
-                            <button
-                              onClick={() => handleRestock(vehicle._id)}
-                              className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold transition cursor-pointer"
-                            >
-                              Restock
-                            </button>
+                        {user?.role === 'ADMIN' && (
+                          <div className="mt-4 border-t border-slate-100 pt-4 space-y-3">
+                            <div className="flex gap-2 items-center">
+                              <input
+                                type="number"
+                                min="1"
+                                placeholder="Amt"
+                                value={restockAmounts[vehicle._id] || ''}
+                                onChange={(e) => setRestockAmounts({ ...restockAmounts, [vehicle._id]: e.target.value })}
+                                className="w-20 px-2.5 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-center"
+                              />
+                              <button
+                                onClick={() => handleRestock(vehicle._id)}
+                                className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold transition cursor-pointer"
+                              >
+                                Restock
+                              </button>
+                            </div>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleStartEdit(vehicle)}
+                                className="flex-1 py-2 border border-slate-200 text-slate-700 rounded-xl text-sm font-medium hover:bg-slate-50 transition cursor-pointer flex items-center justify-center gap-1"
+                              >
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleDelete(vehicle._id)}
+                                className="flex-1 py-2 border border-rose-100 text-rose-600 rounded-xl text-sm font-medium hover:bg-rose-50 transition cursor-pointer flex items-center justify-center gap-1"
+                              >
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                                Delete
+                              </button>
+                            </div>
                           </div>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleStartEdit(vehicle)}
-                              className="flex-1 py-2 border border-slate-200 text-slate-700 rounded-xl text-sm font-medium hover:bg-slate-50 transition cursor-pointer flex items-center justify-center gap-1"
-                            >
-                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                              </svg>
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleDelete(vehicle._id)}
-                              className="flex-1 py-2 border border-rose-100 text-rose-600 rounded-xl text-sm font-medium hover:bg-rose-50 transition cursor-pointer flex items-center justify-center gap-1"
-                            >
-                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                              </svg>
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
                   </div>
                 );

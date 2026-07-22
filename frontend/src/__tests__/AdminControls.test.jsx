@@ -79,9 +79,9 @@ describe('AdminControls Component', () => {
             expect(global.fetch).toHaveBeenCalledWith('http://localhost:4000/api/vehicles', expect.objectContaining({
                 method: 'POST',
                 headers: expect.objectContaining({
-                    'Authorization': 'Bearer token123',
-                    'Content-Type': 'application/json'
-                })
+                    'Authorization': 'Bearer token123'
+                }),
+                body: expect.any(FormData)
             }));
             expect(handleVehicleAction).toHaveBeenCalled();
         });

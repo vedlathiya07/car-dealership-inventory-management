@@ -22,6 +22,10 @@ const vehicleSchema = new Schema({
         required: true,
         default: 0
     },
+    imageUrl: {
+        type: String,
+        required: false
+    }
 });
 
 export const Vehicle = model('Vehicle', vehicleSchema);
