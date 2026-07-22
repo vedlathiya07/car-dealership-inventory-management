@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../config';
 
 export default function Dashboard() {
     const { user, token } = useAuth();
@@ -21,7 +22,7 @@ export default function Dashboard() {
     useEffect(() => {
         const fetchVehicles = async () => {
             try {
-                const res = await fetch('http://localhost:4000/api/vehicles', {
+                const res = await fetch(`${API_URL}/api/vehicles`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -47,7 +48,7 @@ export default function Dashboard() {
 
     const handlePurchase = async (vehicleId) => {
         try {
-            const res = await fetch(`http://localhost:4000/api/vehicles/${vehicleId}/purchase`, {
+            const res = await fetch(`${API_URL}/api/vehicles/${vehicleId}/purchase`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -72,7 +73,7 @@ export default function Dashboard() {
     const handleRestock = async (vehicleId) => {
         const quantity = restockAmounts[vehicleId] || 1;
         try {
-            const res = await fetch(`http://localhost:4000/api/vehicles/${vehicleId}/restock`, {
+            const res = await fetch(`${API_URL}/api/vehicles/${vehicleId}/restock`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -111,7 +112,7 @@ export default function Dashboard() {
     const handleSaveEdit = async (e, vehicleId) => {
         e.preventDefault();
         try {
-            const res = await fetch(`http://localhost:4000/api/vehicles/${vehicleId}`, {
+            const res = await fetch(`${API_URL}/api/vehicles/${vehicleId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -142,7 +143,7 @@ export default function Dashboard() {
 
     const handleDelete = async (vehicleId) => {
         try {
-            const res = await fetch(`http://localhost:4000/api/vehicles/${vehicleId}`, {
+            const res = await fetch(`${API_URL}/api/vehicles/${vehicleId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
