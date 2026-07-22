@@ -20,7 +20,7 @@ describe('RegisterForm Component', () => {
         expect(await screen.findByText(/all fields are required/i)).toBeInTheDocument();
     });
 
-    it('should call onRegister with email and password when submitted with valid input', async () => {
+    it('should call onRegister with email, password, and role when submitted with valid input', async () => {
         const handleRegister = vi.fn();
         render(<RegisterForm onRegister={handleRegister} />);
 
@@ -30,7 +30,8 @@ describe('RegisterForm Component', () => {
 
         expect(handleRegister).toHaveBeenCalledWith({
             email: 'user@example.com',
-            password: 'password123'
+            password: 'password123',
+            role: 'USER'
         });
     });
 });

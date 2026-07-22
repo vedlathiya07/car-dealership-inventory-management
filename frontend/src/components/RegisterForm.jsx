@@ -3,6 +3,7 @@ import { useState } from 'react';
 export default function RegisterForm({ onRegister }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [role, setRole] = useState('USER');
     const [error, setError] = useState('');
 
     const handleSubmit = (e) => {
@@ -15,7 +16,7 @@ export default function RegisterForm({ onRegister }) {
 
         setError('');
         if (onRegister) {
-            onRegister({ email, password });
+            onRegister({ email, password, role });
         }
     };
 
@@ -51,9 +52,22 @@ export default function RegisterForm({ onRegister }) {
                 />
             </div>
 
+            <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Role</label>
+                <select
+                    aria-label="Role"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    className="w-full px-3.5 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white transition duration-150"
+                >
+                    <option value="USER">User (Customer)</option>
+                    <option value="ADMIN">Admin (Dealership Manager)</option>
+                </select>
+            </div>
+
             <button
                 type="submit"
-                className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-sm hover:shadow transition duration-150 text-sm"
+                className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-sm hover:shadow transition duration-150 text-sm cursor-pointer"
             >
                 Register
             </button>
