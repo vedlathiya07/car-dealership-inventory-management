@@ -215,10 +215,18 @@ function MainDashboard() {
     }
   };
 
+  const isSearchActive = !!(
+    searchFilters.make.trim() ||
+    searchFilters.model.trim() ||
+    searchFilters.category.trim() ||
+    searchFilters.minPrice ||
+    searchFilters.maxPrice
+  );
+
   return (
     <main className="max-w-6xl mx-auto px-6 py-8">
       <SearchBar onSearch={handleSearch} />
-      <AdminControls onVehicleAction={handleVehicleAction} />
+      {!isSearchActive && <AdminControls onVehicleAction={handleVehicleAction} />}
 
       {loading ? (
         <div className="text-center py-20 text-gray-500 font-medium">Loading inventory...</div>
