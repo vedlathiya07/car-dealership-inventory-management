@@ -69,7 +69,7 @@ describe('AdminControls Component', () => {
 
         fireEvent.change(screen.getByPlaceholderText(/make/i), { target: { value: 'Toyota' } });
         fireEvent.change(screen.getByPlaceholderText(/model/i), { target: { value: 'Supra' } });
-        fireEvent.change(screen.getByPlaceholderText(/category/i), { target: { value: 'Coupe' } });
+        fireEvent.change(screen.getByRole('combobox', { name: /category/i }), { target: { value: 'Coupe' } });
         fireEvent.change(screen.getByPlaceholderText(/price/i), { target: { value: '50000' } });
         fireEvent.change(screen.getByPlaceholderText(/quantity/i), { target: { value: '1' } });
 

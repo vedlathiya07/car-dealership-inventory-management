@@ -96,13 +96,20 @@ export default function AdminControls({ onVehicleAction }) {
 
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                    <input
-                        type="text"
-                        placeholder="Category"
+                    <select
+                        aria-label="Category"
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
-                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
-                    />
+                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm bg-white"
+                    >
+                        <option value="">Select Category</option>
+                        <option value="Sedan">Sedan</option>
+                        <option value="SUV">SUV</option>
+                        <option value="Coupe">Coupe</option>
+                        <option value="Truck">Truck</option>
+                        <option value="Hatchback">Hatchback</option>
+                        <option value="Convertible">Convertible</option>
+                    </select>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">

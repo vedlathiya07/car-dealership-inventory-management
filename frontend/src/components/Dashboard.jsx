@@ -206,13 +206,21 @@ export default function Dashboard() {
                                         </div>
                                         <div>
                                             <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Category</label>
-                                            <input
-                                                type="text"
+                                            <select
+                                                aria-label="Category"
                                                 value={editCategory}
                                                 onChange={(e) => setEditCategory(e.target.value)}
-                                                className="w-full px-2.5 py-1.5 border rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                className="w-full px-2.5 py-1.5 border rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
                                                 required
-                                            />
+                                            >
+                                                <option value="">Select Category</option>
+                                                <option value="Sedan">Sedan</option>
+                                                <option value="SUV">SUV</option>
+                                                <option value="Coupe">Coupe</option>
+                                                <option value="Truck">Truck</option>
+                                                <option value="Hatchback">Hatchback</option>
+                                                <option value="Convertible">Convertible</option>
+                                            </select>
                                         </div>
                                         <div className="grid grid-cols-2 gap-2">
                                             <div>

@@ -8,7 +8,7 @@ describe('SearchBar Component', () => {
 
         expect(screen.getByPlaceholderText(/make/i)).toBeInTheDocument();
         expect(screen.getByPlaceholderText(/model/i)).toBeInTheDocument();
-        expect(screen.getByPlaceholderText(/category/i)).toBeInTheDocument();
+        expect(screen.getByRole('combobox', { name: /category/i })).toBeInTheDocument();
         expect(screen.getByPlaceholderText(/min price/i)).toBeInTheDocument();
         expect(screen.getByPlaceholderText(/max price/i)).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /search/i })).toBeInTheDocument();
@@ -21,7 +21,7 @@ describe('SearchBar Component', () => {
 
         fireEvent.change(screen.getByPlaceholderText(/make/i), { target: { value: 'Toyota' } });
         fireEvent.change(screen.getByPlaceholderText(/model/i), { target: { value: 'Camry' } });
-        fireEvent.change(screen.getByPlaceholderText(/category/i), { target: { value: 'Sedan' } });
+        fireEvent.change(screen.getByRole('combobox', { name: /category/i }), { target: { value: 'Sedan' } });
         fireEvent.change(screen.getByPlaceholderText(/min price/i), { target: { value: '15000' } });
         fireEvent.change(screen.getByPlaceholderText(/max price/i), { target: { value: '30000' } });
 
