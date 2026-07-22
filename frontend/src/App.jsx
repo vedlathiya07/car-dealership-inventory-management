@@ -109,6 +109,10 @@ function MainDashboard({ activeTab, setActiveTab }) {
   // Restock state
   const [restockAmounts, setRestockAmounts] = useState({});
 
+  // Purchase confirmation & dummy payment overlay state
+  const [purchasingVehicle, setPurchasingVehicle] = useState(null);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+
   const fetchFilteredVehicles = async (filters = searchFilters) => {
     setLoading(true);
     setError('');
@@ -482,7 +486,7 @@ function MainDashboard({ activeTab, setActiveTab }) {
                         </span>
                       </div>
                       <button
-                        onClick={() => handlePurchase(vehicle._id)}
+                        onClick={() => setPurchasingVehicle(vehicle)}
                         disabled={vehicle.quantity <= 0}
                         className={`w-full py-2.5 rounded-xl font-bold text-sm transition-all duration-150 cursor-pointer ${vehicle.quantity > 0
                           ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow'
@@ -539,6 +543,86 @@ function MainDashboard({ activeTab, setActiveTab }) {
             </div>
           )}
         </>
+      )}
+
+      {purchasingVehicle && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-100 rounded-3xl p-8 max-w-md w-full shadow-xl animate-in fade-in zoom-in-95 duration-150">
+            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl font-bold mb-5">
+              💳
+            </div>
+            <h3 className="text-xl font-bold text-slate-800 tracking-tight">Confirm Purchase</h3>
+            <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+              You are about to purchase the <span className="font-bold text-slate-700">{purchasingVehicle.make} {purchasingVehicle.model}</span> ({purchasingVehicle.category}) for <span className="font-extrabold text-blue-600">${purchasingVehicle.price.toLocaleString()}</span>.
+            </p>
+
+            {/* Dummy Payment form */}
+            <div className="mt-6 space-y-4 border-t border-slate-100 pt-5">
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Card Number</label>
+                <input
+                  type="text"
+                  disabled
+                  value="•••• •••• •••• 4242"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-500 font-medium cursor-not-allowed"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Expiry</label>
+                  <input
+                    type="text"
+                    disabled
+                    value="12 / 29"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-500 font-medium cursor-not-allowed text-center"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">CVC</label>
+                  <input
+                    type="text"
+                    disabled
+                    value="•••"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-500 font-medium cursor-not-allowed text-center"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-8">
+              <button
+                onClick={() => setPurchasingVehicle(null)}
+                disabled={isProcessingPayment}
+                className="flex-1 py-3 border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50 transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  setIsProcessingPayment(true);
+                  await new Promise(resolve => setTimeout(resolve, 1500));
+                  await handlePurchase(purchasingVehicle._id);
+                  setIsProcessingPayment(false);
+                  setPurchasingVehicle(null);
+                }}
+                disabled={isProcessingPayment}
+                className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-sm hover:shadow transition cursor-pointer flex items-center justify-center gap-2"
+              >
+                {isProcessingPayment ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing...
+                  </>
+                ) : (
+                  'Pay Now'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </main>
   );
