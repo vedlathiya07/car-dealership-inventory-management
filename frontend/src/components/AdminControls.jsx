@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { API_URL } from '../config';
 
 export default function AdminControls({ onVehicleAction }) {
     const { user, token } = useAuth();
+    const { showToast } = useToast();
 
     const [make, setMake] = useState('');
     const [model, setModel] = useState('');
@@ -25,6 +27,7 @@ export default function AdminControls({ onVehicleAction }) {
         const isTestEnv = typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test';
         if (!make.trim() || !model.trim() || !category.trim() || !price || !quantity || (!imageFile && !isTestEnv)) {
             setError('All fields, including an image, are required');
+            showToast('All fields, including an image, are required', 'error');
             return;
         }
 
@@ -55,6 +58,7 @@ export default function AdminControls({ onVehicleAction }) {
                 throw new Error(data.error || 'Failed to add vehicle');
             }
 
+            showToast('Vehicle added successfully!', 'success');
             setSuccess('Vehicle added successfully!');
             setMake('');
             setModel('');
@@ -72,6 +76,7 @@ export default function AdminControls({ onVehicleAction }) {
             }
         } catch (err) {
             setError(err.message);
+            showToast(err.message, 'error');
         }
     };
 

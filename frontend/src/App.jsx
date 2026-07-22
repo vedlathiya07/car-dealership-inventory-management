@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ToastProvider, useToast } from './context/ToastContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
@@ -10,8 +11,14 @@ import { API_URL } from './config';
 
 function Navigation({ activeTab, setActiveTab }) {
   const { user, logout } = useAuth();
+  const { showToast } = useToast();
 
   if (!user) return null;
+
+  const handleLogout = () => {
+    logout();
+    showToast('Logged out successfully!', 'success');
+  };
 
   return (
     <aside className="w-full md:w-64 bg-white border-b md:border-b-0 md:border-r border-slate-200 flex flex-col justify-between p-6 shrink-0 md:h-screen md:sticky md:top-0">
@@ -71,7 +78,7 @@ function Navigation({ activeTab, setActiveTab }) {
         </div>
 
         <button
-          onClick={logout}
+          onClick={handleLogout}
           className="w-full px-4 py-2.5 bg-rose-50 text-rose-600 font-semibold rounded-xl border border-rose-100 hover:bg-rose-100 hover:text-rose-700 active:scale-95 transition cursor-pointer flex items-center justify-center gap-2 text-sm"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -86,6 +93,7 @@ function Navigation({ activeTab, setActiveTab }) {
 
 function MainDashboard({ activeTab, setActiveTab }) {
   const { user, token } = useAuth();
+  const { showToast } = useToast();
   const [searchFilters, setSearchFilters] = useState({
     make: '',
     model: '',
@@ -175,8 +183,9 @@ function MainDashboard({ activeTab, setActiveTab }) {
 
       const updated = await res.json();
       setVehicles(prev => prev.map(v => v._id === vehicleId ? updated : v));
+      showToast(`${updated.make} ${updated.model} purchased successfully!`, 'success');
     } catch (err) {
-      alert(err.message);
+      showToast(err.message, 'error');
     }
   };
 
@@ -201,8 +210,9 @@ function MainDashboard({ activeTab, setActiveTab }) {
         prev.map((v) => (v._id === vehicleId ? updated : v))
       );
       setRestockAmounts((prev) => ({ ...prev, [vehicleId]: '' }));
+      showToast(`Successfully restocked ${updated.make} ${updated.model} by ${quantity} units!`, 'success');
     } catch (err) {
-      alert(err.message);
+      showToast(err.message, 'error');
     }
   };
 
@@ -252,8 +262,9 @@ function MainDashboard({ activeTab, setActiveTab }) {
       );
       setEditingVehicleId(null);
       setEditImageFile(null);
+      showToast(`${updated.make} ${updated.model} updated successfully!`, 'success');
     } catch (err) {
-      alert(err.message);
+      showToast(err.message, 'error');
     }
   };
 
@@ -271,8 +282,9 @@ function MainDashboard({ activeTab, setActiveTab }) {
       }
 
       setVehicles((prev) => prev.filter((v) => v._id !== vehicleId));
+      showToast('Vehicle deleted successfully from database.', 'success');
     } catch (err) {
-      alert(err.message);
+      showToast(err.message, 'error');
     }
   };
 
@@ -653,6 +665,7 @@ function MainDashboard({ activeTab, setActiveTab }) {
 
 function AuthPage({ isLogin }) {
   const { login } = useAuth();
+  const { showToast } = useToast();
   const [serverError, setServerError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
@@ -676,11 +689,14 @@ function AuthPage({ isLogin }) {
 
       if (isLogin) {
         login(data.token, data.user);
+        showToast('Logged in successfully! Welcome back.', 'success');
       } else {
         setSuccessMsg('Registration successful! Please login.');
+        showToast('Registration successful! Please log in.', 'success');
       }
     } catch (err) {
       setServerError(err.message);
+      showToast(err.message, 'error');
     }
   };
 
@@ -768,10 +784,12 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
-    </AuthProvider>
+    <ToastProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </AuthProvider>
+    </ToastProvider>
   );
 }
