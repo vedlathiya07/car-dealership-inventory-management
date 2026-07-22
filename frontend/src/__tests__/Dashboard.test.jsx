@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import Dashboard from '../components/Dashboard';
 import { AuthProvider } from '../context/AuthContext';
@@ -59,5 +59,61 @@ describe('Dashboard Component', () => {
         );
 
         expect(await screen.findByText(/no vehicles found/i)).toBeInTheDocument();
+    });
+
+    it('should disable the purchase button if quantity is 0', async () => {
+        const mockVehicles = [
+            { _id: '1', make: 'Toyota', model: 'Camry', category: 'Sedan', price: 25000, quantity: 0 }
+        ];
+
+        global.fetch.mockResolvedValueOnce({
+            ok: true,
+            json: async () => mockVehicles
+        });
+
+        render(
+            <AuthProvider>
+                <MemoryRouter>
+                    <Dashboard />
+                </MemoryRouter>
+            </AuthProvider>
+        );
+
+        const purchaseBtn = await screen.findByRole('button', { name: /purchase/i });
+        expect(purchaseBtn).toBeDisabled();
+    });
+
+    it('should decrement the quantity when purchase is clicked successfully', async () => {
+        const mockVehicles = [
+            { _id: '1', make: 'Toyota', model: 'Camry', category: 'Sedan', price: 25000, quantity: 3 }
+        ];
+
+        global.fetch.mockResolvedValueOnce({
+            ok: true,
+            json: async () => mockVehicles
+        });
+
+        global.fetch.mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ ...mockVehicles[0], quantity: 2 })
+        });
+
+        render(
+            <AuthProvider>
+                <MemoryRouter>
+                    <Dashboard />
+                </MemoryRouter>
+            </AuthProvider>
+        );
+
+        const purchaseBtn = await screen.findByRole('button', { name: /purchase/i });
+        expect(purchaseBtn).toBeEnabled();
+
+        fireEvent.click(purchaseBtn);
+
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledTimes(2);
+            expect(screen.getByText(/2 available/i)).toBeInTheDocument();
+        });
     });
 });

@@ -10,7 +10,6 @@ export default function Dashboard() {
     useEffect(() => {
         const fetchVehicles = async () => {
             try {
-                // Fetch from the backend API port
                 const res = await fetch('http://localhost:4000/api/vehicles', {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -34,6 +33,30 @@ export default function Dashboard() {
             fetchVehicles();
         }
     }, [token]);
+
+    const handlePurchase = async (vehicleId) => {
+        try {
+            const res = await fetch(`http://localhost:4000/api/vehicles/${vehicleId}/purchase`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!res.ok) {
+                throw new Error('Purchase failed');
+            }
+
+            const updatedVehicle = await res.json();
+
+            // Update the vehicle's state locally
+            setVehicles((prev) =>
+                prev.map((v) => (v._id === vehicleId ? updatedVehicle : v))
+            );
+        } catch (err) {
+            alert(err.message);
+        }
+    };
 
     if (loading) {
         return <div className="text-center mt-10 text-gray-600">Loading inventory...</div>;
@@ -68,11 +91,24 @@ export default function Dashboard() {
                                     ${vehicle.price.toLocaleString()}
                                 </p>
                             </div>
-                            <div className="flex justify-between items-center text-sm border-t pt-4">
-                                <span className="text-gray-500">In Stock:</span>
-                                <span className={`font-bold ${vehicle.quantity > 0 ? 'text-green-600' : 'text-red-500'}`}>
-                                    {vehicle.quantity} available
-                                </span>
+                            <div className="border-t pt-4">
+                                <div className="flex justify-between items-center text-sm mb-4">
+                                    <span className="text-gray-500">In Stock:</span>
+                                    <span className={`font-bold ${vehicle.quantity > 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                        {vehicle.quantity} available
+                                    </span>
+                                </div>
+
+                                <button
+                                    onClick={() => handlePurchase(vehicle._id)}
+                                    disabled={vehicle.quantity <= 0}
+                                    className={`w-full py-2 rounded-md font-semibold text-sm transition ${vehicle.quantity > 0
+                                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                        }`}
+                                >
+                                    Purchase
+                                </button>
                             </div>
                         </div>
                     ))}
