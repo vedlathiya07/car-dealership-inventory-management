@@ -4,7 +4,7 @@ import { User } from '../models/User.js';
 
 export const register = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, role } = req.body;
 
         if (!email || !password || password.length < 6) {
             return res.status(400).json({
@@ -18,7 +18,9 @@ export const register = async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await User.create({ email, password: hashedPassword });
+        // Automatically make user an ADMIN if email contains 'admin'
+        const assignedRole = role || (email.toLowerCase().includes('admin') ? 'ADMIN' : 'USER');
+        const user = await User.create({ email, password: hashedPassword, role: assignedRole });
 
         return res.status(201).json({ userId: user._id });
     } catch (error) {
