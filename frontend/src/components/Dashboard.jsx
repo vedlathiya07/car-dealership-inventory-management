@@ -15,6 +15,9 @@ export default function Dashboard() {
     const [editPrice, setEditPrice] = useState('');
     const [editQuantity, setEditQuantity] = useState('');
 
+    // Restock state
+    const [restockAmounts, setRestockAmounts] = useState({});
+
     useEffect(() => {
         const fetchVehicles = async () => {
             try {
@@ -61,6 +64,32 @@ export default function Dashboard() {
             setVehicles((prev) =>
                 prev.map((v) => (v._id === vehicleId ? updatedVehicle : v))
             );
+        } catch (err) {
+            alert(err.message);
+        }
+    };
+
+    const handleRestock = async (vehicleId) => {
+        const quantity = restockAmounts[vehicleId] || 1;
+        try {
+            const res = await fetch(`http://localhost:4000/api/vehicles/${vehicleId}/restock`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ quantity: Number(quantity) })
+            });
+
+            if (!res.ok) {
+                throw new Error('Restock failed');
+            }
+
+            const updatedVehicle = await res.json();
+            setVehicles((prev) =>
+                prev.map((v) => (v._id === vehicleId ? updatedVehicle : v))
+            );
+            setRestockAmounts((prev) => ({ ...prev, [vehicleId]: '' }));
         } catch (err) {
             alert(err.message);
         }
@@ -262,19 +291,37 @@ export default function Dashboard() {
                                     </button>
 
                                     {user?.role === 'ADMIN' && (
-                                        <div className="flex gap-2 mt-2">
-                                            <button
-                                                onClick={() => handleStartEdit(vehicle)}
-                                                className="flex-1 py-1.5 border border-gray-300 text-gray-700 rounded text-sm font-medium hover:bg-gray-50 transition"
-                                            >
-                                                Edit
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(vehicle._id)}
-                                                className="flex-1 py-1.5 border border-red-200 text-red-600 rounded text-sm font-medium hover:bg-red-50 transition"
-                                            >
-                                                Delete
-                                            </button>
+                                        <div className="mt-4 border-t pt-3 space-y-2">
+                                            <div className="flex gap-2 items-center">
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    placeholder="Amt"
+                                                    value={restockAmounts[vehicle._id] || ''}
+                                                    onChange={(e) => setRestockAmounts({ ...restockAmounts, [vehicle._id]: e.target.value })}
+                                                    className="w-20 px-2.5 py-1 border rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                />
+                                                <button
+                                                    onClick={() => handleRestock(vehicle._id)}
+                                                    className="flex-1 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded text-sm font-semibold transition"
+                                                >
+                                                    Restock
+                                                </button>
+                                            </div>
+                                            <div className="flex gap-2 pt-1">
+                                                <button
+                                                    onClick={() => handleStartEdit(vehicle)}
+                                                    className="flex-1 py-1.5 border border-gray-300 text-gray-700 rounded text-sm font-medium hover:bg-gray-50 transition"
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(vehicle._id)}
+                                                    className="flex-1 py-1.5 border border-red-200 text-red-600 rounded text-sm font-medium hover:bg-red-50 transition"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
                                         </div>
                                     )}
                                 </div>

@@ -247,4 +247,47 @@ describe('Dashboard Component', () => {
             expect(screen.getByText(/Toyota Camry Hybrid/i)).toBeInTheDocument();
         });
     });
+
+    it('should restock a vehicle and call restock API when Restock is clicked by admin', async () => {
+        sessionStorage.setItem('user', JSON.stringify({ email: 'admin@example.com', role: 'ADMIN' }));
+        const mockVehicles = [
+            { _id: '1', make: 'Toyota', model: 'Camry', category: 'Sedan', price: 25000, quantity: 5 }
+        ];
+
+        global.fetch.mockResolvedValueOnce({
+            ok: true,
+            json: async () => mockVehicles
+        });
+
+        global.fetch.mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ _id: '1', make: 'Toyota', model: 'Camry', category: 'Sedan', price: 25000, quantity: 15 })
+        });
+
+        render(
+            <AuthProvider>
+                <MemoryRouter>
+                    <Dashboard />
+                </MemoryRouter>
+            </AuthProvider>
+        );
+
+        const restockInput = await screen.findByPlaceholderText('Amt');
+        fireEvent.change(restockInput, { target: { value: '10' } });
+
+        const restockBtn = screen.getByRole('button', { name: /restock/i });
+        fireEvent.click(restockBtn);
+
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledWith('http://localhost:4000/api/vehicles/1/restock', expect.objectContaining({
+                method: 'POST',
+                headers: expect.objectContaining({
+                    'Authorization': 'Bearer token123',
+                    'Content-Type': 'application/json'
+                }),
+                body: JSON.stringify({ quantity: 10 })
+            }));
+            expect(screen.getByText(/15 available/i)).toBeInTheDocument();
+        });
+    });
 });
