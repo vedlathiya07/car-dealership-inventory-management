@@ -9,7 +9,7 @@ import AdminControls from './components/AdminControls';
 import { useState, useEffect } from 'react';
 import { API_URL } from './config';
 
-function Navigation({ activeTab, setActiveTab, theme, toggleTheme }) {
+function Navigation({ activeTab, setActiveTab }) {
   const { user, logout } = useAuth();
   const { showToast } = useToast();
 
@@ -21,7 +21,7 @@ function Navigation({ activeTab, setActiveTab, theme, toggleTheme }) {
   };
 
   return (
-    <aside className="w-full md:w-64 bg-white dark:bg-slate-900 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between p-6 shrink-0 md:h-screen md:sticky md:top-0 transition-colors duration-200">
+    <aside className="w-full md:w-64 bg-white border-b md:border-b-0 md:border-r border-slate-200 flex flex-col justify-between p-6 shrink-0 md:h-screen md:sticky md:top-0">
       <div className="space-y-6">
         {/* Brand */}
         <Link to="/" className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent hover:opacity-90 transition flex items-center gap-2">
@@ -35,8 +35,8 @@ function Navigation({ activeTab, setActiveTab, theme, toggleTheme }) {
             onClick={() => setActiveTab('inventory')}
             className={`w-full px-4 py-2.5 rounded-xl font-semibold text-sm transition flex items-center gap-3 cursor-pointer ${
               activeTab === 'inventory'
-                ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
-                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-805 hover:text-slate-900 dark:hover:text-slate-100'
+                ? 'bg-blue-50 text-blue-600'
+                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
             }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -50,8 +50,8 @@ function Navigation({ activeTab, setActiveTab, theme, toggleTheme }) {
               onClick={() => setActiveTab('add-vehicle')}
               className={`w-full px-4 py-2.5 rounded-xl font-semibold text-sm transition flex items-center gap-3 cursor-pointer ${
                 activeTab === 'add-vehicle'
-                  ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-805 hover:text-slate-900 dark:hover:text-slate-100'
+                  ? 'bg-blue-50 text-blue-600'
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
               }`}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -63,26 +63,15 @@ function Navigation({ activeTab, setActiveTab, theme, toggleTheme }) {
         </nav>
       </div>
 
-      {/* Theme Switcher & User Card & Logout */}
-      <div className="space-y-4 pt-6 border-t border-slate-100 dark:border-slate-800">
-        <div className="flex justify-between items-center px-1">
-          <span className="text-[10px] font-bold text-slate-400 dark:text-slate-555 uppercase tracking-wider">Appearance</span>
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-805 transition cursor-pointer text-xs"
-          >
-            {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
-          </button>
-        </div>
-
+      {/* User Card & Logout */}
+      <div className="space-y-4 pt-6 border-t border-slate-100">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center text-sm font-bold text-slate-700 dark:text-slate-300">
+          <div className="w-10 h-10 bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-center text-sm font-bold text-slate-700">
             {user.email.substring(0, 2).toUpperCase()}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate leading-tight">{user.email}</p>
-            <span className="inline-block mt-0.5 text-[10px] bg-blue-600 dark:bg-blue-700 text-white px-2 py-0.5 rounded font-bold uppercase tracking-wider scale-95 origin-left">
+            <p className="text-sm font-bold text-slate-800 truncate leading-tight">{user.email}</p>
+            <span className="inline-block mt-0.5 text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded font-bold uppercase tracking-wider scale-95 origin-left">
               {user.role}
             </span>
           </div>
@@ -90,7 +79,7 @@ function Navigation({ activeTab, setActiveTab, theme, toggleTheme }) {
 
         <button
           onClick={handleLogout}
-          className="w-full px-4 py-2.5 bg-rose-50 dark:bg-rose-955/20 text-rose-600 dark:text-rose-400 font-semibold rounded-xl border border-rose-100 dark:border-rose-900/30 hover:bg-rose-100 dark:hover:bg-rose-900/30 active:scale-95 transition cursor-pointer flex items-center justify-center gap-2 text-sm"
+          className="w-full px-4 py-2.5 bg-rose-50 text-rose-600 font-semibold rounded-xl border border-rose-100 hover:bg-rose-100 hover:text-rose-700 active:scale-95 transition cursor-pointer flex items-center justify-center gap-2 text-sm"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
@@ -765,21 +754,6 @@ function AppRoutes() {
   const { user, logout } = useAuth();
   const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState('inventory');
-  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
-
-  useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [theme]);
-
-  const toggleTheme = () => {
-    const nextTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(nextTheme);
-    localStorage.setItem('theme', nextTheme);
-  };
 
   const handleLogout = () => {
     logout();
@@ -788,16 +762,7 @@ function AppRoutes() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-200 flex items-center justify-center p-4 relative">
-        <div className="absolute top-5 right-5">
-          <button
-            onClick={toggleTheme}
-            className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-805 transition cursor-pointer"
-            title="Toggle Theme"
-          >
-            {theme === 'light' ? '🌙' : '☀️'}
-          </button>
-        </div>
+      <div className="min-h-screen bg-slate-50 text-slate-800 flex items-center justify-center p-4 relative">
         <Routes>
           <Route path="/login" element={<AuthPage isLogin={true} />} />
           <Route path="/register" element={<AuthPage isLogin={false} />} />
@@ -808,10 +773,10 @@ function AppRoutes() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-850 dark:text-slate-100 transition-colors duration-200 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col md:flex-row">
       {user.role === 'ADMIN' ? (
         <>
-          <Navigation activeTab={activeTab} setActiveTab={setActiveTab} theme={theme} toggleTheme={toggleTheme} />
+          <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="flex-1 flex flex-col min-w-0">
             <Routes>
               <Route
@@ -828,27 +793,19 @@ function AppRoutes() {
         </>
       ) : (
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 py-4 px-6 flex justify-between items-center transition-colors duration-200 shadow-sm">
+          <header className="bg-white border-b border-slate-200 py-4 px-6 flex justify-between items-center shadow-sm">
             <Link to="/" className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent flex items-center gap-2">
               <span className="text-2xl">🚘</span>
               <span>AutoInventory</span>
             </Link>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={toggleTheme}
-                className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-805 transition cursor-pointer"
-                title="Toggle Theme"
-              >
-                {theme === 'light' ? '🌙' : '☀️'}
-              </button>
-
+            <div className="flex items-center gap-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center text-sm font-bold text-slate-700 dark:text-slate-350">
+                <div className="w-10 h-10 bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-center text-sm font-bold text-slate-700">
                   {user.email.substring(0, 2).toUpperCase()}
                 </div>
                 <div className="hidden sm:block text-left">
-                  <p className="text-xs font-bold text-slate-800 dark:text-slate-205 leading-none">{user.email}</p>
-                  <span className="inline-block mt-1 text-[8px] bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                  <p className="text-xs font-bold text-slate-805 leading-none">{user.email}</p>
+                  <span className="inline-block mt-1 text-[8px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
                     {user.role}
                   </span>
                 </div>
@@ -856,7 +813,7 @@ function AppRoutes() {
 
               <button
                 onClick={handleLogout}
-                className="px-3.5 py-2.5 bg-rose-50 dark:bg-rose-955/20 text-rose-600 dark:text-rose-450 font-bold rounded-xl border border-rose-100 dark:border-rose-900/30 hover:bg-rose-105 dark:hover:bg-rose-900/30 active:scale-95 transition cursor-pointer text-xs flex items-center gap-1.5"
+                className="px-4 py-2 bg-rose-50 text-rose-600 font-bold rounded-xl border border-rose-100 hover:bg-rose-100 active:scale-95 transition cursor-pointer text-xs flex items-center gap-1.5"
               >
                 Logout
               </button>

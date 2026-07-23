@@ -60,7 +60,7 @@ const sampleVehicles = [
         category: 'SUV',
         price: 139900,
         quantity: 3,
-        tempUrl: 'https://images.unsplash.com/photo-1520050206274-a1ae446cb3cc?q=80&w=800'
+        tempUrl: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=800'
     },
     {
         make: 'Chevrolet',
