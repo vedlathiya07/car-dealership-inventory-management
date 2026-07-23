@@ -104,6 +104,7 @@ function MainDashboard({ activeTab, setActiveTab }) {
 
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState('');
 
   // Inline edit state
@@ -150,6 +151,7 @@ function MainDashboard({ activeTab, setActiveTab }) {
       setError(err.message);
     } finally {
       setLoading(false);
+      setInitialLoading(false);
     }
   };
 
@@ -298,7 +300,7 @@ function MainDashboard({ activeTab, setActiveTab }) {
   const lowStockCount = vehicles.filter(v => v.quantity <= 2).length;
 
   return (
-    <main className="max-w-6xl mx-auto px-6 py-8 flex-1">
+    <main className="max-w-6xl mx-auto px-6 py-8 flex-1 w-full">
       {/* Overview Header */}
       <header className="flex justify-between items-center mb-8 border-b border-slate-200 pb-4">
         <div>
@@ -381,7 +383,7 @@ function MainDashboard({ activeTab, setActiveTab }) {
             </div>
           )}
 
-          {loading && vehicles.length === 0 ? (
+          {initialLoading ? (
             <div className="text-center py-20 text-gray-500 font-medium">Loading inventory...</div>
           ) : error ? (
             <div className="text-center py-20 text-red-500 font-medium">Error: {error}</div>
