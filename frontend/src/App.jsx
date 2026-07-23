@@ -381,7 +381,7 @@ function MainDashboard({ activeTab, setActiveTab }) {
             </div>
           )}
 
-          {loading ? (
+          {loading && vehicles.length === 0 ? (
             <div className="text-center py-20 text-gray-500 font-medium">Loading inventory...</div>
           ) : error ? (
             <div className="text-center py-20 text-red-500 font-medium">Error: {error}</div>
@@ -793,30 +793,32 @@ function AppRoutes() {
         </>
       ) : (
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="bg-white border-b border-slate-200 py-4 px-6 flex justify-between items-center shadow-sm">
-            <Link to="/" className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent flex items-center gap-2">
-              <span className="text-2xl">🚘</span>
-              <span>AutoInventory</span>
-            </Link>
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-center text-sm font-bold text-slate-700">
-                  {user.email.substring(0, 2).toUpperCase()}
+          <header className="bg-white border-b border-slate-200 py-4 shadow-sm">
+            <div className="max-w-6xl mx-auto px-6 w-full flex justify-between items-center">
+              <Link to="/" className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent flex items-center gap-2">
+                <span className="text-2xl">🚘</span>
+                <span>AutoInventory</span>
+              </Link>
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-center text-sm font-bold text-slate-700">
+                    {user.email.substring(0, 2).toUpperCase()}
+                  </div>
+                  <div className="hidden sm:block text-left">
+                    <p className="text-xs font-bold text-slate-805 leading-none">{user.email}</p>
+                    <span className="inline-block mt-1 text-[8px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                      {user.role}
+                    </span>
+                  </div>
                 </div>
-                <div className="hidden sm:block text-left">
-                  <p className="text-xs font-bold text-slate-805 leading-none">{user.email}</p>
-                  <span className="inline-block mt-1 text-[8px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                    {user.role}
-                  </span>
-                </div>
-              </div>
 
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 bg-rose-50 text-rose-600 font-bold rounded-xl border border-rose-100 hover:bg-rose-100 active:scale-95 transition cursor-pointer text-xs flex items-center gap-1.5"
-              >
-                Logout
-              </button>
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 bg-rose-50 text-rose-600 font-bold rounded-xl border border-rose-100 hover:bg-rose-100 active:scale-95 transition cursor-pointer text-xs flex items-center gap-1.5"
+                >
+                  Logout
+                </button>
+              </div>
             </div>
           </header>
           <div className="flex-1 flex flex-col p-6 md:p-8 max-w-7xl w-full mx-auto">
