@@ -133,5 +133,3 @@
 ## Task: Frontend Dashboard restock control — implementation
 **Prompt:** "Implement quick restock controls (input + button) on Dashboard vehicle card for ADMIN posting to /api/vehicles/:id/restock"
 **Outcome:** Added restock input and button to `Dashboard.jsx`. `npm test` is GREEN (23/23 tests passed).
-
-

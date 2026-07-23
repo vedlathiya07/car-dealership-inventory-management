@@ -32,7 +32,8 @@ describe('SearchBar Component', () => {
             model: 'Camry',
             category: 'Sedan',
             minPrice: '15000',
-            maxPrice: '30000'
+            maxPrice: '30000',
+            sortBy: ''
         });
     });
 
@@ -49,7 +50,8 @@ describe('SearchBar Component', () => {
             model: '',
             category: '',
             minPrice: '',
-            maxPrice: ''
+            maxPrice: '',
+            sortBy: ''
         });
     });
 });
